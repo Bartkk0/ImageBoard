@@ -1,0 +1,19 @@
+{
+    "name": "bartkk/image-board",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Bartkk\\ImageBoard\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Bartkk",
+            "email": "32180149+Bartkk0@users.noreply.github.com"
+        }
+    ],
+    "require": {
+      "ext-pdo": "*",
+      "ext-imagick": "*"
+    }
+}

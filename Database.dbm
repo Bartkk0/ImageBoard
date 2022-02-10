@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+ Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="0.9.4-beta1" use-changelog="false" last-position="0,345" last-zoom="1" max-obj-count="4"
+	 default-schema="public" default-owner="postgres"
+	 layers="Default layer"
+	 active-layers="0"
+	 layer-name-colors="#000000"
+	 layer-rect-colors="#b4b4b4"
+	 show-layer-names="false" show-layer-rects="false">
+<database name="imageboard" is-template="false" allow-conns="true">
+</database>
+
+<schema name="public" layers="0" fill-color="#e1e1e1" sql-disabled="true">
+</schema>
+
+<table name="posts" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="740" y="500"/>
+	<column name="post_id" not-null="true">
+		<type name="serial" length="0"/>
+	</column>
+	<column name="parent_id" default-value="NULL">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="time" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="name" default-value="'Anonymous'">
+		<type name="varchar" length="32"/>
+	</column>
+	<column name="subject">
+		<type name="varchar" length="64"/>
+	</column>
+	<column name="comment">
+		<type name="varchar" length="1024"/>
+	</column>
+	<column name="image" default-value="NULL">
+		<type name="text" length="0"/>
+	</column>
+	<constraint name="posts_pk" type="pk-constr" table="public.posts">
+		<columns names="post_id,time" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<procedure name="create_post" security-type="SECURITY INVOKER">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql"/>
+	<parameter name="in_name" in="true">
+		<type name="varchar" length="0"/>
+	</parameter>
+	<parameter name="in_subject" in="true">
+		<type name="varchar" length="0"/>
+	</parameter>
+	<parameter name="in_comment" in="true">
+		<type name="varchar" length="0"/>
+	</parameter>
+	<parameter name="in_image" in="true">
+		<type name="text" length="0"/>
+	</parameter>
+	<definition><![CDATA[INSERT INTO posts(name, subject, comment, image) VALUES (in_name, in_subject, in_comment, in_image);]]></definition>
+</procedure>
+
+<procedure name="create_reply" security-type="SECURITY INVOKER">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql"/>
+	<parameter name="in_name" in="true">
+		<type name="varchar" length="0"/>
+	</parameter>
+	<parameter name="in_parent">
+		<type name="integer" length="0"/>
+	</parameter>
+	<parameter name="in_subject" in="true">
+		<type name="varchar" length="0"/>
+	</parameter>
+	<parameter name="in_comment" in="true">
+		<type name="varchar" length="0"/>
+	</parameter>
+	<parameter name="in_image" in="true">
+		<type name="text" length="0"/>
+	</parameter>
+	<definition><![CDATA[INSERT INTO posts(name, parent_id, subject, comment, image) VALUES (in_name, in_parent, in_subject, in_comment, in_image);]]></definition>
+</procedure>
+
+<procedure name="clear_old_posts" security-type="SECURITY INVOKER">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql"/>
+	<definition><![CDATA[
+    DECLARE
+        safe_posts integer[];
+        to_delete  integer[];
+
+    BEGIN
+
+        safe_posts := ARRAY(SELECT post_id
+                            FROM posts p
+                            WHERE parent_id IS NULL
+                            ORDER BY (SELECT MAX(time)
+                                      FROM posts
+                                      WHERE parent_id = p.post_id
+                                         OR post_id = p.post_id) DESC
+                            LIMIT 3);
+
+        to_delete := ARRAY(SELECT post_id FROM posts WHERE NOT (post_id = ANY (safe_posts)) OR NOT (parent_id = ANY (safe_posts)));
+
+        DELETE FROM posts WHERE (post_id = ANY (to_delete));
+    END
+]]></definition>
+</procedure>
+
+<function name="get_catalog"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="STABLE"
+		security-type="SECURITY INVOKER"
+		parallel-type="PARALLEL UNSAFE"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql"/>
+	<return-type>
+	<type name="public.posts" length="0"/>
+	</return-type>
+	<definition><![CDATA[SELECT *
+FROM posts p
+ORDER BY (SELECT MAX(time)
+          FROM posts c
+          WHERE c.parent_id = p.post_id
+             OR c.post_id = p.post_id) DESC
+]]></definition>
+</function>
+
+</dbmodel>

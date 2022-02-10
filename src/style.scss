@@ -1,0 +1,138 @@
+*{
+  box-sizing: border-box;
+  margin: 0;
+}
+
+a{
+  color: green;
+  text-decoration: none;
+  &:hover{
+    color: red;
+  }
+}
+
+body{
+  background: beige;
+  padding: 8px;
+}
+
+
+
+.submitForm{
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+  form{
+    border: 1px solid black;
+    padding: 4px;
+    input, label, textarea{
+      display: inline-block;
+      min-width: 15rem;
+      vertical-align: top;
+    }
+    input[type="file"]{
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    input[type="submit"]{
+      width: 100%;
+    }
+  }
+}
+
+.catalog{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+
+  .catalog_options{
+    position: relative;
+    margin: 16px;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+
+    form{
+      display: inline-block;
+    }
+  }
+
+  .catalog_post{
+    width: 10em;
+    margin: 8px;
+    .image{
+      img {
+        width: 100%;
+      }
+    }
+    .name{
+      font-weight: bold;
+    }
+    .subject{
+      width: 100%;
+      text-overflow: clip;
+      overflow-wrap: break-word;
+    }
+  }
+}
+
+.postview{
+  .post{
+    width: calc(100% - 16px);
+    margin: 8px;
+    display: flex;
+    background: #e5e5c2;
+    padding: 8px;
+    img {
+      max-height: 10em;
+      max-width: 15em;
+    }
+    div{
+      width: 100%;
+      margin-left: 8px;
+      .name{
+        display: inline;
+        font-weight: bold;
+        color: green;
+      }
+      .id{
+        display: inline;
+        a{
+          font-weight: bold;
+        }
+      }
+      .time{
+        display: inline;
+      }
+      .mentions{
+        display: inline;
+        a{
+          margin-right: 8px;
+        }
+      }
+      .subject{
+        width: 100%;
+        text-overflow: clip;
+        overflow-wrap: break-word;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.highlighted, :target{
+  background: #ceb59b !important;
+}
+
+.greentext{
+  color: green !important;
+}
+
+.bold{
+  font-weight: bold !important;
+}
+
+.italic{
+  font-style: italic !important;
+}
